@@ -1,0 +1,92 @@
+body {
+    background-color: #f0f2f5;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .light-mode {
+    background-color: #f0f2f5;
+    color: #333333;
+  }
+  
+  .dark-mode {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  .dark-mode .country-list {
+    background-color: #2c2c2c;
+  }
+  
+  .dark-mode .filters {
+    background-color: #3c3c3c;
+  }
+  
+  .dark-mode .country-item,
+  .dark-mode .chart-container {
+    background-color: #2c2c2c;
+    color: #ffffff;
+  }
+  
+  .dark-mode h1,
+  .dark-mode h2,
+  .dark-mode p,
+  .dark-mode label,
+  .dark-mode select,
+  .dark-mode input,
+  .dark-mode .country-item strong {
+    color: #ffffff;
+  }
+  
+  .dark-mode .filters input,
+  .dark-mode .filters select {
+    background-color: #4c4c4c;
+    color: #ffffff;
+    border-color: #5c5c5c;
+  }
+  
+  .dark-mode .export-buttons button {
+    background-color: #5c5c5c;
+    color: #ffffff;
+  }
+  
+  .dark-mode .export-buttons button:hover {
+    background-color: #7c7c7c;
+  }
+  
+  .dark-mode .chart-controls select {
+    background-color: #4c4c4c;
+    color: #ffffff;
+    border-color: #5c5c5c;
+  }
+  
+  button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .language-selector {
+    margin: 10px;
+  }
+  
+  .language-selector select {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+  }
+  
+  .dark-mode .language-selector select {
+    background-color: #4c4c4c;
+    color: #ffffff;
+    border-color: #5c5c5c;
+  }
