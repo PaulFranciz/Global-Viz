@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { useTranslation } from 'react-i18next';
-import '../components/CountryCharts.css'
+import './CountryCharts.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function CountryChart({ countries }) {
   const { t } = useTranslation();
   const [chartType, setChartType] = useState('population');
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const getChartData = () => {
     let sortedCountries = [...countries];
@@ -59,9 +66,24 @@ function CountryChart({ countries }) {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'top' },
-      title: { display: true, text: chartData.title },
+      legend: { 
+        position: 'top',
+        labels: {
+          boxWidth: 10,
+          font: {
+            size: windowWidth < 768 ? 10 : 12
+          }
+        }
+      },
+      title: { 
+        display: true, 
+        text: chartData.title,
+        font: {
+          size: windowWidth < 768 ? 14 : 16
+        }
+      },
     },
     scales: {
       y: {
@@ -69,13 +91,29 @@ function CountryChart({ countries }) {
         title: {
           display: true,
           text: chartData.datasets[0].label,
+          font: {
+            size: windowWidth < 768 ? 10 : 12
+          }
         },
+        ticks: {
+          font: {
+            size: windowWidth < 768 ? 8 : 10
+          }
+        }
       },
       x: {
         title: {
           display: true,
           text: t('countries'),
+          font: {
+            size: windowWidth < 768 ? 10 : 12
+          }
         },
+        ticks: {
+          font: {
+            size: windowWidth < 768 ? 8 : 10
+          }
+        }
       },
     },
   };
@@ -89,7 +127,9 @@ function CountryChart({ countries }) {
           <option value="density">{t('populationDensity')}</option>
         </select>
       </div>
-      <Bar data={chartData} options={options} />
+      <div style={{ height: windowWidth < 768 ? '300px' : '400px' }}>
+        <Bar data={chartData} options={options} />
+      </div>
     </div>
   );
 }

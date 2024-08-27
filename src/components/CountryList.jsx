@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { saveAs } from 'file-saver';
+import { debounce } from 'lodash';
 import CountryChart from './CountryChart';
+import globalviz from '/global viz.jpeg'
 import './CountryList.css';
 
 function CountryList() {
@@ -14,6 +16,8 @@ function CountryList() {
   const [populationMax, setPopulationMax] = useState('');
   const [languageFilter, setLanguageFilter] = useState('');
   const [timezoneFilter, setTimezoneFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [countriesPerPage] = useState(12);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -28,6 +32,14 @@ function CountryList() {
     fetchCountries();
   }, []);
 
+  useEffect(() => {
+    console.log('Search term updated:', searchTerm);
+  }, [searchTerm]);
+
+  const debouncedSetSearchTerm = debounce((value) => {
+    setSearchTerm(value);
+  }, 300);
+
   const filteredCountries = countries.filter(country =>
     country.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (regionFilter === '' || country.region === regionFilter) &&
@@ -37,6 +49,13 @@ function CountryList() {
     (languageFilter === '' || country.languages.some(lang => lang.name.toLowerCase() === languageFilter.toLowerCase())) &&
     (timezoneFilter === '' || country.timezones.includes(timezoneFilter))
   );
+
+  const indexOfLastCountry = currentPage * countriesPerPage;
+  const indexOfFirstCountry = indexOfLastCountry - countriesPerPage;
+  const currentCountries = filteredCountries.slice(indexOfFirstCountry, indexOfLastCountry);
+  const totalPages = Math.ceil(filteredCountries.length / countriesPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const uniqueRegions = [...new Set(countries.map(country => country.region))];
   const uniqueSubregions = [...new Set(countries.map(country => country.subregion))];
@@ -48,7 +67,7 @@ function CountryList() {
     if (format === 'json') {
       dataStr = JSON.stringify(filteredCountries);
     } else if (format === 'csv') {
-      const headers = ['name', 'region', 'subregion', 'population', 'languages', 'timezones'];
+      const headers = ['name', 'region', 'subregion', 'population', 'languages', 'timezones', 'flag'];
       const csvContent = [
         headers.join(','),
         ...filteredCountries.map(country => [
@@ -57,7 +76,8 @@ function CountryList() {
           country.subregion,
           country.population,
           country.languages.map(lang => lang.name).join(';'),
-          country.timezones.join(';')
+          country.timezones.join(';'),
+          country.flag
         ].join(','))
       ].join('\n');
       dataStr = csvContent;
@@ -66,15 +86,83 @@ function CountryList() {
     saveAs(blob, `countries.${format}`);
   };
 
+  const renderPaginationButtons = () => {
+    const pageNumbers = [];
+    const ellipsis = <span key="ellipsis" className="ellipsis">...</span>;
+
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={currentPage === i ? 'active' : ''}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      pageNumbers.push(
+        <button
+          key={1}
+          onClick={() => paginate(1)}
+          className={currentPage === 1 ? 'active' : ''}
+        >
+          1
+        </button>
+      );
+
+      if (currentPage > 3) {
+        pageNumbers.push(ellipsis);
+      }
+
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={currentPage === i ? 'active' : ''}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (currentPage < totalPages - 2) {
+        pageNumbers.push(ellipsis);
+      }
+
+      pageNumbers.push(
+        <button
+          key={totalPages}
+          onClick={() => paginate(totalPages)}
+          className={currentPage === totalPages ? 'active' : ''}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pageNumbers;
+  };
+
   return (
     <div className="country-list">
-      <h1>{t('countryList')}</h1>
+      <div className="header">
+        <img src={globalviz} alt="globalviz" className="globalbiz" />
+        <h1 className='heading'>{t('Global viz')}</h1>
+      </div>
+
       <div className="filters">
         <input
           type="text"
           placeholder={t('search')}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onInput={(e) => debouncedSetSearchTerm(e.target.value)}
         />
         <select value={regionFilter} onChange={(e) => setRegionFilter(e.target.value)}>
           <option value="">{t('allRegions')}</option>
@@ -116,22 +204,42 @@ function CountryList() {
         </select>
       </div>
       <div className="export-buttons">
-        <button onClick={() => exportData('json')}>{t('export')} JSON</button>
-        <button onClick={() => exportData('csv')}>{t('export')} CSV</button>
+        <button className='btn' onClick={() => exportData('json')}>{t('export')} JSON</button>
+        <button className='btn' onClick={() => exportData('csv')}>{t('export')} CSV</button>
       </div>
       <CountryChart countries={filteredCountries} />
-      <ul className="country-items">
-        {filteredCountries.map((country) => (
-          <li key={country.name} className="country-item">
-            <h2>{country.name}</h2>
-            <p>{t('region')}: {country.region}</p>
-            <p>{t('subregion')}: {country.subregion}</p>
-            <p>{t('population')}: {country.population.toLocaleString()}</p>
-            <p>{t('languages')}: {country.languages.map(lang => lang.name).join(', ')}</p>
-            <p>{t('timezones')}: {country.timezones.join(', ')}</p>
-          </li>
+      <div className="country-grid" key={searchTerm}>
+        {currentCountries.map((country) => (
+          <div key={country.name} className="country-card">
+            <div className="country-header">
+              <img src={country.flag} alt={`Flag of ${country.name}`} className="country-flag" />
+              <h2>{country.name}</h2>
+            </div>
+            <p><strong>{t('region')}:</strong> {country.region}</p>
+            <p><strong>{t('subregion')}:</strong> {country.subregion}</p>
+            <p><strong>{t('population')}:</strong> {country.population.toLocaleString()}</p>
+            <p><strong>{t('languages')}:</strong> {country.languages.map(lang => lang.name).join(', ')}</p>
+            <p><strong>{t('timezones')}:</strong> {country.timezones.join(', ')}</p>
+          </div>
         ))}
-      </ul>
+      </div>
+      <div className="pagination">
+        <button
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="pagination-nav"
+        >
+          &laquo; {t('prev')}
+        </button>
+        {renderPaginationButtons()}
+        <button
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="pagination-nav"
+        >
+          {t('next')} &raquo;
+        </button>
+      </div>
     </div>
   );
 }

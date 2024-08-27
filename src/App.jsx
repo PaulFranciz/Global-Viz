@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import CountryList from './components/CountryList';
 import './App.css';
 import './i18n';
+import { FaMoon, FaSun } from 'react-icons/fa';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -27,21 +28,26 @@ function App() {
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
+    document.body.classList.toggle('dark-mode');
   };
 
   return (
-    <div className={darkMode ? 'dark-mode' : 'light-mode'}>
-      <div className="language-selector">
-        <select onChange={(e) => changeLanguage(e.target.value)} value={i18n.language}>
-          {languages.map((lang) => (
-            <option key={lang.code} value={lang.code}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
+    <div className={`app ${darkMode ? 'dark-mode' : 'light-mode'}`}>
+      <div className="top-bar">
+        <div className="language-selector">
+          <select onChange={(e) => changeLanguage(e.target.value)} value={i18n.language}>
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+          {darkMode ? <FaSun /> : <FaMoon />}
+        </button>
       </div>
-      <button onClick={toggleDarkMode}>{t('darkMode')}</button>
-      <CountryList />
+      <CountryList darkMode={darkMode} />
     </div>
   );
 }

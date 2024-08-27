@@ -1,10 +1,33 @@
+.chart-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px;
+}
+
 .chart-controls {
-    margin-bottom: 15px;
-    text-align: right;
+  margin-bottom: 15px;
+  text-align: right;
+}
+
+.chart-controls select {
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 10px;
   }
-  
+
+  .chart-controls {
+    text-align: center;
+  }
+
   .chart-controls select {
-    padding: 5px 10px;
-    font-size: 16px;
-    border-radius: 5px;
+    font-size: 12px;
+    padding: 3px 8px;
   }
+}
