@@ -1,8 +1,19 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ Global Viz 🌍
 
-Currently, two official plugins are available:
+Global Viz is a web-based data visualization tool designed to present complex global datasets through interactive and intuitive charts. Utilizing Chart.js, JavaScript, and RESTful APIs, Global Viz delivers real-time insights with a clean, responsive user interface powered by vanilla CSS.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- Interactive Charts: Visualize data with various chart types.
+- Real-Time Data: Fetches live data from RESTful APIs.
+- Responsive Design: Built with vanilla CSS for a seamless experience on all devices.
+
+## Technologies Used
+- Chart.js for dynamic charting
+- JavaScript for functionality
+- Vanilla CSS for design
+- RESTful APIs for data fetching
+
+Start exploring global data with Global Viz today!
+
+
